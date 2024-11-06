@@ -26,7 +26,9 @@ class ToolUseAgent(RoutedAgent):
     ) -> None:
         super().__init__("An agent with tools")
         self._system_messages: List[LLMMessage] = [
-            SystemMessage("You are a helpful AI assistant.")
+            SystemMessage(
+                "You are a helpful AI assistant. When you retrieve an email always include the email message id in the response."
+            ),
         ]
         self._model_client = model_client
         self._tool_schema = tool_schema
@@ -42,7 +44,9 @@ class ToolUseAgent(RoutedAgent):
         await self._model_context.add_message(user_message)
 
         # Create a session of messages.
-        session: List[LLMMessage] = await self._model_context.get_messages()
+        session: List[LLMMessage] = (
+            self._system_messages + await self._model_context.get_messages()
+        )
 
         # Run the caller loop to handle tool calls.
         messages = await tool_agent_caller_loop(
