@@ -11,6 +11,9 @@ from .contracts.message import Message
 
 from dotenv import load_dotenv
 
+from rich.console import Console
+from rich.markdown import Markdown
+
 
 async def main():
     load_dotenv()
@@ -39,7 +42,12 @@ async def main():
     response = await runtime.send_message(
         Message("What's my latest email about?"), tool_use_agent
     )
-    print(response.content)
+
+    console = Console()
+
+    md = Markdown(response.content)
+    console.print(md)
+    
     # Stop processing messages.
     await runtime.stop()
 
