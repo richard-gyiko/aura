@@ -39,11 +39,16 @@ async def main():
 
     # Send a direct message to the tool agent.
     tool_use_agent = AgentId("tool_use_agent", "default")
-    response = await runtime.send_message(
-        Message("What's my latest email about?"), tool_use_agent
-    )
 
-    Console().print(Markdown(response.content))
+    while True:
+        user_input = input("User: ")
+
+        if user_input == "exit":
+            break
+
+        response = await runtime.send_message(Message(user_input), tool_use_agent)
+
+        Console().print(Markdown(response.content))
 
     # Stop processing messages.
     await runtime.stop()

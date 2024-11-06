@@ -10,6 +10,9 @@ from autogen_core.components.models import (
 )
 from autogen_core.components.tool_agent import tool_agent_caller_loop
 from autogen_core.components.tools import ToolSchema
+from autogen_core.components.model_context import BufferedChatCompletionContext
+from autogen_core.components.models import AssistantMessage
+
 
 from src.message_protocol.messages import Message
 
@@ -28,15 +31,19 @@ class ToolUseAgent(RoutedAgent):
         self._model_client = model_client
         self._tool_schema = tool_schema
         self._tool_agent_id = AgentId(tool_agent_type, self.id.key)
+        self._model_context = BufferedChatCompletionContext(buffer_size=5)
 
     @message_handler
     async def handle_user_message(
         self, message: Message, ctx: MessageContext
     ) -> Message:
+        user_message = UserMessage(content=message.content, source="user")
+
+        await self._model_context.add_message(user_message)
+
         # Create a session of messages.
-        session: List[LLMMessage] = [
-            UserMessage(content=message.content, source="user")
-        ]
+        session: List[LLMMessage] = await self._model_context.get_messages()
+
         # Run the caller loop to handle tool calls.
         messages = await tool_agent_caller_loop(
             self,
@@ -48,4 +55,9 @@ class ToolUseAgent(RoutedAgent):
         )
         # Return the final response.
         assert isinstance(messages[-1].content, str)
+
+        await self._model_context.add_message(
+            AssistantMessage(content=messages[-1].content, source=self.metadata["type"])
+        )
+
         return Message(content=messages[-1].content)
