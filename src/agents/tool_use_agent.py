@@ -11,7 +11,7 @@ from autogen_core.components.models import (
 from autogen_core.components.tool_agent import tool_agent_caller_loop
 from autogen_core.components.tools import ToolSchema
 
-from src.contracts.message import Message
+from src.message_protocol.messages import Message
 
 
 class ToolUseAgent(RoutedAgent):

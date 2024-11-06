@@ -7,7 +7,7 @@ from autogen_core.application import SingleThreadedAgentRuntime
 from autogen_core.components.tool_agent import ToolAgent
 from autogen_ext.models import OpenAIChatCompletionClient
 from autogen_core.base import AgentId
-from .contracts.message import Message
+from .message_protocol.messages import Message
 
 from dotenv import load_dotenv
 
@@ -43,11 +43,8 @@ async def main():
         Message("What's my latest email about?"), tool_use_agent
     )
 
-    console = Console()
+    Console().print(Markdown(response.content))
 
-    md = Markdown(response.content)
-    console.print(md)
-    
     # Stop processing messages.
     await runtime.stop()
 
