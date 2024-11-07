@@ -6,4 +6,4 @@ autogen-core==0.4.0.dev4
 autogen-ext[langchain,openai]==0.4.0.dev4
 
 # Toolkits
-langchain-google-community[gmail]
+langchain-google-community[gmail]~=2.0.2
