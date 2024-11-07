@@ -1,8 +1,10 @@
 from typing import List
 
 from autogen_core.base import AgentId, MessageContext
-from autogen_core.components import RoutedAgent, message_handler
+from autogen_core.components import message_handler, RoutedAgent
+from autogen_core.components.model_context import BufferedChatCompletionContext
 from autogen_core.components.models import (
+    AssistantMessage,
     ChatCompletionClient,
     LLMMessage,
     SystemMessage,
@@ -10,10 +12,6 @@ from autogen_core.components.models import (
 )
 from autogen_core.components.tool_agent import tool_agent_caller_loop
 from autogen_core.components.tools import ToolSchema
-from autogen_core.components.model_context import BufferedChatCompletionContext
-from autogen_core.components.models import AssistantMessage
-
-
 from src.message_protocol.messages import Message
 
 
