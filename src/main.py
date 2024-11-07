@@ -1,18 +1,16 @@
 import asyncio
 
-from .agents.tool_use_agent import ToolUseAgent
-
-from .tools.tool_factory import get_tools
 from autogen_core.application import SingleThreadedAgentRuntime
+from autogen_core.base import AgentId
 from autogen_core.components.tool_agent import ToolAgent
 from autogen_ext.models import OpenAIChatCompletionClient
-from autogen_core.base import AgentId
-from .message_protocol.messages import Message
-
 from dotenv import load_dotenv
-
 from rich.console import Console
 from rich.markdown import Markdown
+
+from .agents.tool_use_agent import ToolUseAgent
+from .message_protocol.messages import Message
+from .tools.tool_factory import get_tools
 
 
 async def main():
