@@ -29,7 +29,7 @@ async def main():
         runtime,
         "tool_use_agent",
         lambda: ToolUseAgent(
-            OpenAIChatCompletionClient(model="gpt-4o-mini"),
+            OpenAIChatCompletionClient(model="gpt-4o-mini", temperature=0.01),
             [tool.schema for tool in tools],
             "tool_executor_agent",
         ),
