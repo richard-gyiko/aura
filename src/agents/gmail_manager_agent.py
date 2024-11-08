@@ -15,7 +15,7 @@ from autogen_core.components.tools import ToolSchema
 from src.message_protocol.messages import Message
 
 
-class ToolUseAgent(RoutedAgent):
+class GmailManagerAgent(RoutedAgent):
     def __init__(
         self,
         model_client: ChatCompletionClient,
@@ -55,11 +55,12 @@ class ToolUseAgent(RoutedAgent):
             tool_schema=self._tool_schema,
             cancellation_token=ctx.cancellation_token,
         )
-        # Return the final response.
+
         assert isinstance(messages[-1].content, str)
 
         await self._model_context.add_message(
             AssistantMessage(content=messages[-1].content, source=self.metadata["type"])
         )
 
+        # Return the final response.
         return Message(content=messages[-1].content)

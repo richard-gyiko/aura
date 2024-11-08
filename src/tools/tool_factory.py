@@ -2,7 +2,7 @@ from autogen_ext.tools import LangChainToolAdapter
 from langchain_google_community import GmailToolkit
 
 
-def get_tools():
+def get_gmail_tools():
     gmailTookit = GmailToolkit()
     tools = gmailTookit.get_tools()
 

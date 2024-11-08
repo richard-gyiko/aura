@@ -8,28 +8,30 @@ from dotenv import load_dotenv
 from rich.console import Console
 from rich.markdown import Markdown
 
-from .agents.tool_use_agent import ToolUseAgent
+from .agents.gmail_manager_agent import GmailManagerAgent
 from .message_protocol.messages import Message
-from .tools.tool_factory import get_tools
+from .tools.tool_factory import get_gmail_tools
 
 
 async def main():
     load_dotenv()
 
-    tools = get_tools()
+    tools = get_gmail_tools()
 
     runtime = SingleThreadedAgentRuntime()
 
     await ToolAgent.register(
-        runtime, "tool_executor_agent", lambda: ToolAgent("tool executor agent", tools)
+        runtime,
+        "gmail_tools_executor_agent",
+        lambda: ToolAgent("Gmail Tools Executor Agent", tools),
     )
-    await ToolUseAgent.register(
+    await GmailManagerAgent.register(
         runtime,
         "tool_use_agent",
-        lambda: ToolUseAgent(
+        lambda: GmailManagerAgent(
             OpenAIChatCompletionClient(model="gpt-4o-mini", temperature=0.01),
             [tool.schema for tool in tools],
-            "tool_executor_agent",
+            "gmail_tools_executor_agent",
         ),
     )
 
