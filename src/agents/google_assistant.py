@@ -16,6 +16,8 @@ from autogen_core.components.tools import ToolSchema
 from src.message_protocol.messages import Message
 from tzlocal import get_localzone
 
+from .utils import print_message
+
 
 class GoogleAssistant(RoutedAgent):
     def _get_timezone(self) -> ZoneInfo:
@@ -27,15 +29,17 @@ class GoogleAssistant(RoutedAgent):
         model_client: ChatCompletionClient,
         tool_schema: List[ToolSchema],
         tool_agent_type: str,
+        print_internal_dialogues: bool = False,
     ) -> None:
         super().__init__("An agent with tools")
         self._system_messages: List[LLMMessage] = [
             SystemMessage(
                 """You are a helpful AI assistant. You are responsible for managing mailing and calendar on behalf of the user on the Google platform.
-                   When you retieve email messages or calendar events, always include the identifier of these entities, so these can be reffered to later.
-                   The user's current timezone is {}. Make sure to use this timezone when working with dates and times.
+                   When you retieve email messages or calendar events, always include the identifier of these entities, so these can be reffered to later.        
+                   Additional information:
+                      - Timezone: {}.
                 """.format(
-                    str(self._get_timezone())
+                    str(self._get_timezone()),
                 ),
             ),
         ]
@@ -43,6 +47,7 @@ class GoogleAssistant(RoutedAgent):
         self._tool_schema = tool_schema
         self._tool_agent_id = AgentId(tool_agent_type, self.id.key)
         self._model_context = BufferedChatCompletionContext(buffer_size=5)
+        self._print_internal_dialogues = print_internal_dialogues
 
     @message_handler
     async def handle_user_message(
@@ -66,6 +71,10 @@ class GoogleAssistant(RoutedAgent):
             tool_schema=self._tool_schema,
             cancellation_token=ctx.cancellation_token,
         )
+
+        if self._print_internal_dialogues:
+            for message in messages:
+                print_message(message)
 
         assert isinstance(messages[-1].content, str)
 

@@ -47,6 +47,7 @@ async def main():
             OpenAIChatCompletionClient(model="gpt-4o-mini", temperature=0.01),
             [tool.schema for tool in tools],
             "gmail_tools_executor_agent",
+            print_internal_dialogues=True,
         ),
     )
 
