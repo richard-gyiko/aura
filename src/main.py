@@ -15,6 +15,7 @@ from .tools.tool_factory import (
     get_google_calendar_tools,
     get_utility_tools,
 )
+from .tracing import configure_otlp_tracing
 
 # We are giving the combined scopes because one of the tools will first navigate to the user constent page so we can ask for the scopes in a single go.
 SCOPES = [
@@ -22,6 +23,8 @@ SCOPES = [
     "https://www.googleapis.com/auth/calendar.readonly",
     "https://www.googleapis.com/auth/calendar.events",
 ]
+
+ENABLE_TRACING = False
 
 
 async def main():
@@ -33,7 +36,9 @@ async def main():
         + get_utility_tools()
     )
 
-    runtime = SingleThreadedAgentRuntime()
+    runtime = SingleThreadedAgentRuntime(
+        tracer_provider=configure_otlp_tracing() if ENABLE_TRACING else None
+    )
 
     await ToolAgent.register(
         runtime,
