@@ -35,7 +35,7 @@ class GoogleAssistant(RoutedAgent):
         self._system_messages: List[LLMMessage] = [
             SystemMessage(
                 """You are a helpful AI assistant. You are responsible for managing mailing and calendar on behalf of the user on the Google platform.
-                   When you retieve email messages or calendar events, always include the identifier of these entities, so these can be reffered to later.        
+                   When you retieve email messages or calendar events, always include the identifier of these entities, so these can be reffered to later.
                    Additional information:
                       - Timezone: {}.
                 """.format(
