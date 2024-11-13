@@ -1,13 +1,17 @@
 from __future__ import annotations
 
 from datetime import datetime
+import logging
 from typing import Any, Dict, List, Optional, Type
 
+from autogen_core.application.logging import TRACE_LOGGER_NAME
 from dateutil import parser, tz
+from googleapiclient.errors import HttpError
 from langchain.callbacks.manager import (
     CallbackManagerForToolRun,
 )
 from pydantic import BaseModel, Field
+from src.utils.timezone import get_local_timezone
 
 from .base import GoogleCalendarBaseTool
 
@@ -38,9 +42,9 @@ class GetEventsSchema(BaseModel):
         default=10,
         description="The maximum number of results to return.",
     )
-    timezone: str = Field(
-        default="America/Chicago",
-        description="The timezone in TZ Database Name format, e.g. 'America/New_York'",
+    timezone: Optional[str] = Field(
+        default=None,
+        description="The timezone in TZ Database Name format, e.g. 'America/New_York'. Defaults to the user's local timezone.",
     )
 
 
@@ -54,6 +58,8 @@ class GoogleCalendarListEvents(GoogleCalendarBaseTool):
         " all the events in the user's calendar between the start and end times."
     )
     args_schema: Type[BaseModel] = GetEventsSchema
+
+    _logger = logging.getLogger(f"{TRACE_LOGGER_NAME}.list_google_calendar_events")
 
     def _parse_event(self, event, timezone):
         # convert to local timezone
@@ -76,10 +82,16 @@ class GoogleCalendarListEvents(GoogleCalendarBaseTool):
 
     def _get_calendars(self):
         calendars = []
-        for cal in self.api_resource.calendarList().list().execute().get("items", []):
-            if cal.get("selected", None):
-                calendars.append(cal["id"])
-        return calendars
+        try:
+            calendar_list = self.api_resource.calendarList().list().execute()
+            self._logger.info("Successfully retrieved calendar list")
+            for cal in calendar_list.get("items", []):
+                if cal.get("selected", None):
+                    calendars.append(cal["id"])
+            return calendars
+        except HttpError as error:
+            self._logger.error(f"Failed to retrieve calendar list: {error}")
+            raise
 
     def _run(
         self,
@@ -89,35 +101,59 @@ class GoogleCalendarListEvents(GoogleCalendarBaseTool):
         timezone: str = "America/Chicago",
         run_manager: Optional[CallbackManagerForToolRun] = None,
     ) -> List(Dict[str, Any]):  # type: ignore
+        try:
+            calendars = self._get_calendars()
 
-        calendars = self._get_calendars()
+            if timezone is None:
+                zone_info = get_local_timezone()
+                timezone = str(zone_info)
 
-        events = []
-        start = datetime.strptime(start_datetime, "%Y-%m-%dT%H:%M:%S")
-        start = start.replace(tzinfo=tz.gettz(timezone)).isoformat()
-        end = datetime.strptime(end_datetime, "%Y-%m-%dT%H:%M:%S")
-        end = end.replace(tzinfo=tz.gettz(timezone)).isoformat()
-        for cal in calendars:
-            events_result = (
-                self.api_resource.events()
-                .list(
-                    calendarId=cal,
-                    timeMin=start,
-                    timeMax=end,
-                    maxResults=max_results,
-                    singleEvents=True,
-                    orderBy="startTime",
+            events = []
+            start = datetime.strptime(start_datetime, "%Y-%m-%dT%H:%M:%S")
+            end = datetime.strptime(end_datetime, "%Y-%m-%dT%H:%M:%S")
+
+            # Format datetime objects to RFC3339 format with timezone
+            start = start.replace(tzinfo=tz.gettz(timezone))
+            end = end.replace(tzinfo=tz.gettz(timezone))
+            start_rfc = start.isoformat()
+            end_rfc = end.isoformat()
+
+            self._logger.debug(f"Formatted start time: {start_rfc}")
+            self._logger.debug(f"Formatted end time: {end_rfc}")
+
+            for cal in calendars:
+                self._logger.info(f"Fetching events for calendar: {cal}")
+                events_result = (
+                    self.api_resource.events()
+                    .list(
+                        calendarId=cal,
+                        timeMin=start_rfc,
+                        timeMax=end_rfc,
+                        maxResults=max_results,
+                        singleEvents=True,
+                        orderBy="startTime",
+                        timeZone=timezone,
+                    )
+                    .execute()
                 )
-                .execute()
+                cal_events = events_result.get("items", [])
+                self._logger.info(f"Found {len(cal_events)} events in calendar {cal}")
+                events.extend(cal_events)
+
+            events = sorted(
+                events, key=lambda x: x["start"].get("dateTime", x["start"].get("date"))
             )
-            cal_events = events_result.get("items", [])
-            events.extend(cal_events)
 
-        events = sorted(
-            events, key=lambda x: x["start"].get("dateTime", x["start"].get("date"))
-        )
+            return [self._parse_event(e, timezone) for e in events]
 
-        return [self._parse_event(e, timezone) for e in events]
+        except HttpError as error:
+            self._logger.error(f"Failed to retrieve calendar events: {error}")
+            self._logger.error(f"Error details: {error.error_details}")
+            self._logger.error(f"Response content: {error.content}")
+            raise
+        except Exception as e:
+            self._logger.error(f"Unexpected error occurred: {str(e)}")
+            raise
 
     async def _arun(
         self,

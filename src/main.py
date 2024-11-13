@@ -1,6 +1,8 @@
 import asyncio
+import logging
 
 from autogen_core.application import SingleThreadedAgentRuntime
+from autogen_core.application.logging import TRACE_LOGGER_NAME
 from autogen_core.base import AgentId
 from autogen_core.components.tool_agent import ToolAgent
 from autogen_ext.models import OpenAIChatCompletionClient
@@ -24,7 +26,13 @@ SCOPES = [
     "https://www.googleapis.com/auth/calendar.events",
 ]
 
-ENABLE_TRACING = False
+ENABLE_OTEL_TRACING = False
+ENABLE_TRACE_LOGGING = True
+
+if ENABLE_TRACE_LOGGING:
+    logging.basicConfig(level=logging.WARNING)
+    logger = logging.getLogger(TRACE_LOGGER_NAME)
+    logger.setLevel(logging.DEBUG)
 
 
 async def main():
@@ -37,7 +45,7 @@ async def main():
     )
 
     runtime = SingleThreadedAgentRuntime(
-        tracer_provider=configure_otlp_tracing() if ENABLE_TRACING else None
+        tracer_provider=configure_otlp_tracing() if ENABLE_OTEL_TRACING else None
     )
 
     await ToolAgent.register(
@@ -52,7 +60,7 @@ async def main():
             OpenAIChatCompletionClient(model="gpt-4o-mini", temperature=0.01),
             [tool.schema for tool in tools],
             "gmail_tools_executor_agent",
-            print_internal_dialogues=True,
+            print_internal_dialogues=False,
         ),
     )
 

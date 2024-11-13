@@ -10,7 +10,7 @@ def configure_otlp_tracing(endpoint: str = "http://localhost:4317") -> trace.Tra
     resource = Resource(attributes={
         SERVICE_NAME: "aura"
     })
-    
+
     tracer_provider = TracerProvider(resource=resource)
     processor = BatchSpanProcessor(
         OTLPSpanExporter(

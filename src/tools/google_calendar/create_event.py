@@ -1,11 +1,14 @@
 from __future__ import annotations
 
 from datetime import datetime
+import logging
+from dateutil import tz
 from typing import Optional, Type
 
-from dateutil import tz
+from autogen_core.application.logging import TRACE_LOGGER_NAME
 from langchain.callbacks.manager import CallbackManagerForToolRun
 from pydantic import BaseModel, Field
+from src.utils.timezone import get_local_timezone
 
 from .base import GoogleCalendarBaseTool
 
@@ -41,9 +44,9 @@ class CreateEventSchema(BaseModel):
     description: Optional[str] = Field(
         default="", description="The description of the event. Optional."
     )
-    timezone: str = Field(
-        default="America/Chicago",
-        description="The timezone in TZ Database Name format, e.g. 'America/New_York'",
+    timezone: Optional[str] = Field(
+        default=None,
+        description="The timezone in TZ Database Name format, e.g. 'America/New_York'. Defaults to the user's local timezone.",
     )
 
 
@@ -56,6 +59,8 @@ class GoogleCalendarCreateEvent(GoogleCalendarBaseTool):
     )
     args_schema: Type[BaseModel] = CreateEventSchema
 
+    _logger = logging.getLogger(f"{TRACE_LOGGER_NAME}.list_google_calendar_events")
+
     def _run(
         self,
         start_datetime: str,
@@ -63,31 +68,46 @@ class GoogleCalendarCreateEvent(GoogleCalendarBaseTool):
         summary: str,
         location: str = "",
         description: str = "",
-        timezone: str = "America/Chicago",
+        timezone: str = None,
         run_manager: Optional[CallbackManagerForToolRun] = None,
     ) -> str:
 
-        start = datetime.strptime(start_datetime, "%Y-%m-%dT%H:%M:%S")
-        start = start.replace(tzinfo=tz.gettz(timezone)).isoformat()
-        end = datetime.strptime(end_datetime, "%Y-%m-%dT%H:%M:%S")
-        end = end.replace(tzinfo=tz.gettz(timezone)).isoformat()
+        try:
+            start = datetime.strptime(start_datetime, "%Y-%m-%dT%H:%M:%S")
+            end = datetime.strptime(end_datetime, "%Y-%m-%dT%H:%M:%S")
 
-        calendar = "primary"
-        body = {
-            "summary": summary,
-            "start": {"dateTime": start},
-            "end": {"dateTime": end},
-        }
-        if location != "":
-            body["location"] = location
-        if description != "":
-            body["description"] = description
+            if timezone is None:
+                zone_info = get_local_timezone()
+                timezone = str(zone_info)
 
-        event = (
-            self.api_resource.events().insert(calendarId=calendar, body=body).execute()
-        )
+            # Format datetime objects to RFC3339 format with timezone
+            start = start.replace(tzinfo=tz.gettz(timezone))
+            end = end.replace(tzinfo=tz.gettz(timezone))
+            start_rfc = start.isoformat()
+            end_rfc = end.isoformat()
 
-        return "Event created: " + event.get("htmlLink", "Failed to create event")
+            calendar = "primary"
+            body = {
+                "summary": summary,
+                "start": {"dateTime": start_rfc, "timeZone": timezone},
+                "end": {"dateTime": end_rfc, "timeZone": timezone},
+            }
+
+            if location != "":
+                body["location"] = location
+            if description != "":
+                body["description"] = description
+
+            event = (
+                self.api_resource.events()
+                .insert(calendarId=calendar, body=body)
+                .execute()
+            )
+
+            return "Event created: " + event.get("htmlLink", "Failed to create event")
+        except Exception as e:
+            self._logger.error(f"Failed to create calendar event: {str(e)}")
+            raise
 
     async def _arun(
         self,
