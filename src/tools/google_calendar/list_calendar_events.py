@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-from datetime import datetime
 import logging
 from typing import Any, Dict, List, Optional, Type
 
@@ -14,6 +13,7 @@ from pydantic import BaseModel, Field
 from src.utils.timezone import get_local_timezone
 
 from .base import GoogleCalendarBaseTool
+from .utils import parse_and_format_datetime
 
 
 class GetEventsSchema(BaseModel):
@@ -49,6 +49,13 @@ class GetEventsSchema(BaseModel):
 
 
 class GoogleCalendarListEvents(GoogleCalendarBaseTool):
+    """Tool for listing events from Google Calendar.
+    
+    This tool searches for calendar events across all of the user's selected calendars
+    within a specified time range. Results include event details like title, time,
+    location and attendees. All times are handled in the user's local timezone by default.
+    """
+    
     name: str = "list_google_calendar_events"
     description: str = (
         " Use this tool to search for the user's calendar events."
@@ -59,7 +66,7 @@ class GoogleCalendarListEvents(GoogleCalendarBaseTool):
     )
     args_schema: Type[BaseModel] = GetEventsSchema
 
-    _logger = logging.getLogger(f"{TRACE_LOGGER_NAME}.list_google_calendar_events")
+    _logger = logging.getLogger(f"{TRACE_LOGGER_NAME}.{name}")
 
     def _parse_event(self, event, timezone):
         # convert to local timezone
@@ -98,9 +105,9 @@ class GoogleCalendarListEvents(GoogleCalendarBaseTool):
         start_datetime: str,
         end_datetime: str,
         max_results: int = 10,
-        timezone: str = "America/Chicago",
+        timezone: Optional[str] = None,
         run_manager: Optional[CallbackManagerForToolRun] = None,
-    ) -> List(Dict[str, Any]):  # type: ignore
+    ) -> List[Dict[str, Any]]:
         try:
             calendars = self._get_calendars()
 
@@ -109,17 +116,10 @@ class GoogleCalendarListEvents(GoogleCalendarBaseTool):
                 timezone = str(zone_info)
 
             events = []
-            start = datetime.strptime(start_datetime, "%Y-%m-%dT%H:%M:%S")
-            end = datetime.strptime(end_datetime, "%Y-%m-%dT%H:%M:%S")
 
-            # Format datetime objects to RFC3339 format with timezone
-            start = start.replace(tzinfo=tz.gettz(timezone))
-            end = end.replace(tzinfo=tz.gettz(timezone))
-            start_rfc = start.isoformat()
-            end_rfc = end.isoformat()
-
-            self._logger.debug(f"Formatted start time: {start_rfc}")
-            self._logger.debug(f"Formatted end time: {end_rfc}")
+            start_rfc, end_rfc, timezone = parse_and_format_datetime(
+                start_datetime, end_datetime, timezone
+            )
 
             for cal in calendars:
                 self._logger.info(f"Fetching events for calendar: {cal}")

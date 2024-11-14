@@ -1,8 +1,6 @@
 from __future__ import annotations
 
-from datetime import datetime
 import logging
-from dateutil import tz
 from typing import Optional, Type
 
 from autogen_core.application.logging import TRACE_LOGGER_NAME
@@ -11,6 +9,7 @@ from pydantic import BaseModel, Field
 from src.utils.timezone import get_local_timezone
 
 from .base import GoogleCalendarBaseTool
+from .utils import parse_and_format_datetime
 
 
 class CreateEventSchema(BaseModel):
@@ -51,6 +50,13 @@ class CreateEventSchema(BaseModel):
 
 
 class GoogleCalendarCreateEvent(GoogleCalendarBaseTool):
+    """Tool for creating events in Google Calendar.
+    
+    This tool allows creation of calendar events in the user's primary calendar
+    with support for start/end times, title, location and description.
+    All times are handled in the user's local timezone by default.
+    """
+    
     name: str = "create_google_calendar_event"
     description: str = (
         " Use this tool to create a new calendar event in user's primary calendar."
@@ -59,7 +65,7 @@ class GoogleCalendarCreateEvent(GoogleCalendarBaseTool):
     )
     args_schema: Type[BaseModel] = CreateEventSchema
 
-    _logger = logging.getLogger(f"{TRACE_LOGGER_NAME}.list_google_calendar_events")
+    _logger = logging.getLogger(f"{TRACE_LOGGER_NAME}.{name}")
 
     def _run(
         self,
@@ -71,20 +77,14 @@ class GoogleCalendarCreateEvent(GoogleCalendarBaseTool):
         timezone: str = None,
         run_manager: Optional[CallbackManagerForToolRun] = None,
     ) -> str:
-
         try:
-            start = datetime.strptime(start_datetime, "%Y-%m-%dT%H:%M:%S")
-            end = datetime.strptime(end_datetime, "%Y-%m-%dT%H:%M:%S")
-
             if timezone is None:
                 zone_info = get_local_timezone()
                 timezone = str(zone_info)
 
-            # Format datetime objects to RFC3339 format with timezone
-            start = start.replace(tzinfo=tz.gettz(timezone))
-            end = end.replace(tzinfo=tz.gettz(timezone))
-            start_rfc = start.isoformat()
-            end_rfc = end.isoformat()
+            start_rfc, end_rfc, timezone = parse_and_format_datetime(
+                start_datetime, end_datetime, timezone
+            )
 
             calendar = "primary"
             body = {

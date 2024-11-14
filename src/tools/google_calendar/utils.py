@@ -2,9 +2,13 @@
 
 from __future__ import annotations
 
+from datetime import datetime
 import logging
 import os
 from typing import List, Optional, Tuple, TYPE_CHECKING
+
+from dateutil import tz
+from src.utils.timezone import get_local_timezone
 
 if TYPE_CHECKING:
     from google.auth.transport.requests import Request  # type: ignore[import]
@@ -148,3 +152,29 @@ def build_resource_service(
     )
     builder = import_googleapiclient_resource_builder()
     return builder(service_name, service_version, credentials=credentials)
+
+
+def parse_and_format_datetime(
+    start_datetime: str, end_datetime: str, timezone: str = None
+) -> Tuple[str, str, str]:
+    """
+    Parse datetime strings and return RFC3339 formatted strings with timezone.
+
+    Args:
+        start_datetime: Start datetime string in format "YYYY-MM-DDTHH:MM:SS"
+        end_datetime: End datetime string in format "YYYY-MM-DDTHH:MM:SS"
+        timezone: Optional timezone string (e.g. 'America/New_York')
+
+    Returns:
+        Tuple of (start_rfc, end_rfc, timezone)
+    """
+    if timezone is None:
+        timezone = str(get_local_timezone())
+
+    start = datetime.strptime(start_datetime, "%Y-%m-%dT%H:%M:%S")
+    end = datetime.strptime(end_datetime, "%Y-%m-%dT%H:%M:%S")
+
+    start = start.replace(tzinfo=tz.gettz(timezone))
+    end = end.replace(tzinfo=tz.gettz(timezone))
+
+    return start.isoformat(), end.isoformat(), timezone
