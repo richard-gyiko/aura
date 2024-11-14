@@ -51,12 +51,12 @@ class CreateEventSchema(BaseModel):
 
 class GoogleCalendarCreateEvent(GoogleCalendarBaseTool):
     """Tool for creating events in Google Calendar.
-    
+
     This tool allows creation of calendar events in the user's primary calendar
     with support for start/end times, title, location and description.
     All times are handled in the user's local timezone by default.
     """
-    
+
     name: str = "create_google_calendar_event"
     description: str = (
         " Use this tool to create a new calendar event in user's primary calendar."

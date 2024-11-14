@@ -50,12 +50,12 @@ class GetEventsSchema(BaseModel):
 
 class GoogleCalendarListEvents(GoogleCalendarBaseTool):
     """Tool for listing events from Google Calendar.
-    
+
     This tool searches for calendar events across all of the user's selected calendars
     within a specified time range. Results include event details like title, time,
     location and attendees. All times are handled in the user's local timezone by default.
     """
-    
+
     name: str = "list_google_calendar_events"
     description: str = (
         " Use this tool to search for the user's calendar events."
@@ -91,7 +91,6 @@ class GoogleCalendarListEvents(GoogleCalendarBaseTool):
         calendars = []
         try:
             calendar_list = self.api_resource.calendarList().list().execute()
-            self._logger.info("Successfully retrieved calendar list")
             for cal in calendar_list.get("items", []):
                 if cal.get("selected", None):
                     calendars.append(cal["id"])
@@ -122,7 +121,6 @@ class GoogleCalendarListEvents(GoogleCalendarBaseTool):
             )
 
             for cal in calendars:
-                self._logger.info(f"Fetching events for calendar: {cal}")
                 events_result = (
                     self.api_resource.events()
                     .list(
@@ -137,7 +135,6 @@ class GoogleCalendarListEvents(GoogleCalendarBaseTool):
                     .execute()
                 )
                 cal_events = events_result.get("items", [])
-                self._logger.info(f"Found {len(cal_events)} events in calendar {cal}")
                 events.extend(cal_events)
 
             events = sorted(
@@ -148,8 +145,6 @@ class GoogleCalendarListEvents(GoogleCalendarBaseTool):
 
         except HttpError as error:
             self._logger.error(f"Failed to retrieve calendar events: {error}")
-            self._logger.error(f"Error details: {error.error_details}")
-            self._logger.error(f"Response content: {error.content}")
             raise
         except Exception as e:
             self._logger.error(f"Unexpected error occurred: {str(e)}")

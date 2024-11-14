@@ -70,7 +70,7 @@ async def main():
     tool_use_agent = AgentId("tool_use_agent", "default")
 
     while True:
-        user_input = input("User: ")
+        user_input = input("> ")
 
         if user_input == "exit":
             break
