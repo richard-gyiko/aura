@@ -1,6 +1,8 @@
 import asyncio
+import logging
 
 from autogen_core.application import SingleThreadedAgentRuntime
+from autogen_core.application.logging import TRACE_LOGGER_NAME
 from autogen_core.base import AgentId
 from autogen_core.components.tool_agent import ToolAgent
 from autogen_ext.models import OpenAIChatCompletionClient
@@ -8,30 +10,57 @@ from dotenv import load_dotenv
 from rich.console import Console
 from rich.markdown import Markdown
 
-from .agents.gmail_manager_agent import GmailManagerAgent
+from .agents.google_assistant import GoogleAssistant
 from .message_protocol.messages import Message
-from .tools.tool_factory import get_gmail_tools
+from .tools.tool_factory import (
+    get_gmail_tools,
+    get_google_calendar_tools,
+    get_utility_tools,
+)
+from .tracing import configure_otlp_tracing
+
+# We are giving the combined scopes because one of the tools will first navigate to the user constent page so we can ask for the scopes in a single go.
+SCOPES = [
+    "https://mail.google.com/",
+    "https://www.googleapis.com/auth/calendar.readonly",
+    "https://www.googleapis.com/auth/calendar.events",
+]
+
+ENABLE_OTEL_TRACING = False
+ENABLE_TRACE_LOGGING = True
+
+if ENABLE_TRACE_LOGGING:
+    logging.basicConfig(level=logging.WARNING)
+    logger = logging.getLogger(TRACE_LOGGER_NAME)
+    logger.setLevel(logging.DEBUG)
 
 
 async def main():
     load_dotenv()
 
-    tools = get_gmail_tools()
+    tools = (
+        get_gmail_tools(SCOPES)
+        + get_google_calendar_tools(SCOPES)
+        + get_utility_tools()
+    )
 
-    runtime = SingleThreadedAgentRuntime()
+    runtime = SingleThreadedAgentRuntime(
+        tracer_provider=configure_otlp_tracing() if ENABLE_OTEL_TRACING else None
+    )
 
     await ToolAgent.register(
         runtime,
         "gmail_tools_executor_agent",
         lambda: ToolAgent("Gmail Tools Executor Agent", tools),
     )
-    await GmailManagerAgent.register(
+    await GoogleAssistant.register(
         runtime,
         "tool_use_agent",
-        lambda: GmailManagerAgent(
+        lambda: GoogleAssistant(
             OpenAIChatCompletionClient(model="gpt-4o-mini", temperature=0.01),
             [tool.schema for tool in tools],
             "gmail_tools_executor_agent",
+            print_internal_dialogues=False,
         ),
     )
 
@@ -41,7 +70,7 @@ async def main():
     tool_use_agent = AgentId("tool_use_agent", "default")
 
     while True:
-        user_input = input("User: ")
+        user_input = input("> ")
 
         if user_input == "exit":
             break

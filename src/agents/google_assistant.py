@@ -1,4 +1,5 @@
 from typing import List
+from zoneinfo import ZoneInfo
 
 from autogen_core.base import AgentId, MessageContext
 from autogen_core.components import message_handler, RoutedAgent
@@ -13,25 +14,40 @@ from autogen_core.components.models import (
 from autogen_core.components.tool_agent import tool_agent_caller_loop
 from autogen_core.components.tools import ToolSchema
 from src.message_protocol.messages import Message
+from tzlocal import get_localzone
+
+from .utils import print_message
 
 
-class GmailManagerAgent(RoutedAgent):
+class GoogleAssistant(RoutedAgent):
+    def _get_timezone(self) -> ZoneInfo:
+        """Get the current system timezone."""
+        return ZoneInfo(str(get_localzone()))
+
     def __init__(
         self,
         model_client: ChatCompletionClient,
         tool_schema: List[ToolSchema],
         tool_agent_type: str,
+        print_internal_dialogues: bool = False,
     ) -> None:
         super().__init__("An agent with tools")
         self._system_messages: List[LLMMessage] = [
             SystemMessage(
-                "You are a helpful AI assistant. When you retrieve an email always include the email message id in the response."
+                """You are a helpful AI assistant. You are responsible for managing mailing and calendar on behalf of the user on the Google platform.
+                   When you retieve email messages or calendar events, always include the identifier of these entities, so these can be reffered to later.
+                   Additional information:
+                      - Timezone: {}.
+                """.format(
+                    str(self._get_timezone()),
+                ),
             ),
         ]
         self._model_client = model_client
         self._tool_schema = tool_schema
         self._tool_agent_id = AgentId(tool_agent_type, self.id.key)
         self._model_context = BufferedChatCompletionContext(buffer_size=5)
+        self._print_internal_dialogues = print_internal_dialogues
 
     @message_handler
     async def handle_user_message(
@@ -55,6 +71,10 @@ class GmailManagerAgent(RoutedAgent):
             tool_schema=self._tool_schema,
             cancellation_token=ctx.cancellation_token,
         )
+
+        if self._print_internal_dialogues:
+            for message in messages:
+                print_message(message)
 
         assert isinstance(messages[-1].content, str)
 
