@@ -69,15 +69,21 @@ async def main():
     # Send a direct message to the tool agent.
     tool_use_agent = AgentId("tool_use_agent", "default")
 
+    console = Console()
+
     while True:
-        user_input = input("> ")
+        # User input with emoji indicator
+        console.print("> ", end="")
+        user_input = console.input("")
 
         if user_input == "exit":
             break
 
         response = await runtime.send_message(Message(user_input), tool_use_agent)
 
-        Console().print(Markdown(response.content))
+        # AI response with emoji and styling
+        console.print(Markdown(response.content), style="light_sea_green")
+        console.print()  # Extra line after response for better readability
 
     # Stop processing messages.
     await runtime.stop()
