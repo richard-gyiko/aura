@@ -10,7 +10,7 @@ from dotenv import load_dotenv
 from rich.console import Console
 from rich.markdown import Markdown
 
-from .agents.google_assistant import GoogleAssistant
+from .agents.aura import Aura
 from .message_protocol.messages import Message
 from .tools.tool_factory import (
     get_gmail_tools,
@@ -50,16 +50,16 @@ async def main():
 
     await ToolAgent.register(
         runtime,
-        "gmail_tools_executor_agent",
-        lambda: ToolAgent("Gmail Tools Executor Agent", tools),
+        "tool_executor_agent",
+        lambda: ToolAgent("Tools Executor Agent", tools),
     )
-    await GoogleAssistant.register(
+    await Aura.register(
         runtime,
         "tool_use_agent",
-        lambda: GoogleAssistant(
+        lambda: Aura(
             OpenAIChatCompletionClient(model="gpt-4o-mini", temperature=0.01),
             [tool.schema for tool in tools],
-            "gmail_tools_executor_agent",
+            "tool_executor_agent",
             print_internal_dialogues=False,
         ),
     )

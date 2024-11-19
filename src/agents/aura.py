@@ -18,8 +18,19 @@ from tzlocal import get_localzone
 
 from .utils import print_message
 
+SYSTEM_PROMPT_TEMPLATE = """
+You are a versatile and efficient AI assistant specialized in managing the user's email and calendar.
+Your primary responsibilities include:
+- **Email Management**: Retrieve, organize, and manage email messages. Always include a unique identifier for each message to ensure easy reference.
+- **Calendar Management**: Schedule, update, and retrieve calendar events while resolving conflicts or overlaps.
+Guidelines:
+- Adhere to the specified timezone for all date and time-related tasks: {timezone}.
+- Provide clear, concise, and user-friendly responses, prioritizing accuracy and convenience.
+- Proactively notify the user of important updates, conflicts, or pending actions in their email or calendar.
+"""
 
-class GoogleAssistant(RoutedAgent):
+
+class Aura(RoutedAgent):
     def _get_timezone(self) -> ZoneInfo:
         """Get the current system timezone."""
         return ZoneInfo(str(get_localzone()))
@@ -34,13 +45,7 @@ class GoogleAssistant(RoutedAgent):
         super().__init__("An agent with tools")
         self._system_messages: List[LLMMessage] = [
             SystemMessage(
-                """You are a helpful AI assistant. You are responsible for managing mailing and calendar on behalf of the user on the Google platform.
-                   When you retieve email messages or calendar events, always include the identifier of these entities, so these can be reffered to later.
-                   Additional information:
-                      - Timezone: {}.
-                """.format(
-                    str(self._get_timezone()),
-                ),
+                SYSTEM_PROMPT_TEMPLATE.format(timezone=str(self._get_timezone())),
             ),
         ]
         self._model_client = model_client
