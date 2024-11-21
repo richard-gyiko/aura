@@ -13,7 +13,6 @@ async def main():
     console = Console()
 
     while True:
-        # User input with emoji indicator
         console.print("> ", end="")
         user_input = console.input("")
 

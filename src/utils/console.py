@@ -10,12 +10,12 @@ from rich.text import Text
 
 
 async def RichConsole(
-    stream: AsyncGenerator[AgentMessage | Response, None], 
-    show_intermediate: bool = True
+    stream: AsyncGenerator[AgentMessage | Response, None],
+    show_intermediate: bool = True,
 ) -> None:
     """Consume the stream from  :meth:`~autogen_agentchat.teams.Team.run_stream`
     and print the messages to the console.
-    
+
     Args:
         stream: The message stream to consume
         show_intermediate: Whether to show intermediate messages (default: True)
