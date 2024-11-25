@@ -40,7 +40,7 @@ def aura() -> AssistantAgent:
         + get_utility_tools()
     )
 
-    assitant = AssistantAgent(
+    assistant = AssistantAgent(
         name="aura",
         model_client=OpenAIChatCompletionClient(
             model="gpt-4o-mini",
@@ -50,4 +50,4 @@ def aura() -> AssistantAgent:
         system_message=SYSTEM_PROMPT_TEMPLATE.format(timezone=str(_get_timezone())),
     )
 
-    return assitant
+    return assistant

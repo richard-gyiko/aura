@@ -2,7 +2,7 @@ import asyncio
 
 from autogen_agentchat.messages import TextMessage
 from autogen_core.base import CancellationToken
-from rich.console import Console
+from dotenv import load_dotenv
 
 from .agents.aura import aura
 from .utils.console import RichConsole
@@ -10,22 +10,26 @@ from .utils.console import RichConsole
 
 async def main():
     agent = aura()
-    console = Console()
 
     while True:
-        console.print("> ", end="")
-        user_input = console.input("")
+        try:
+            user_input = input("> ")
 
-        if user_input == "exit":
-            break
+            if user_input == "exit":
+                break
 
-        await RichConsole(
-            agent.on_messages_stream(
-                [TextMessage(content=user_input, source="user")],
-                cancellation_token=CancellationToken(),
+            await RichConsole(
+                stream=agent.on_messages_stream(
+                    [TextMessage(content=user_input, source="user")],
+                    cancellation_token=CancellationToken(),
+                ),
+                show_intermediate=True,
             )
-        )
+        except KeyboardInterrupt:
+            print("\nGoodbye! 👋")
+            break
 
 
 if __name__ == "__main__":
+    load_dotenv()
     asyncio.run(main())
