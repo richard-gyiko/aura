@@ -25,7 +25,7 @@ class DeleteEventSchema(BaseModel):
             "Guests who should receive notifications about the deletion of the event. "
             "Possible values are: 'all' to notify all guests, 'externalOnly' to notify only "
             "non-Google Calendar guests, or 'none' to send no notifications."
-        )
+        ),
     )
 
 
@@ -50,15 +50,13 @@ class GoogleCalendarDeleteEvent(GoogleCalendarBaseTool):
     def _run(
         self,
         event_id: str,
-        calendar_id: str = "primary", 
+        calendar_id: str = "primary",
         send_updates: str = "all",
         run_manager: Optional[CallbackManagerForToolRun] = None,
     ) -> str:
         try:
             self.api_resource.events().delete(
-                calendarId=calendar_id,
-                eventId=event_id,
-                sendUpdates=send_updates
+                calendarId=calendar_id, eventId=event_id, sendUpdates=send_updates
             ).execute()
 
             return f"Successfully deleted event {event_id}"

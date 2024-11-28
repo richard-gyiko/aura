@@ -15,11 +15,11 @@ class ModifyEmailLabelsSchema(BaseModel):
     )
     add_labels: Optional[List[str]] = Field(
         default=None,
-        description="List of label IDs to add to the message. You can add up to 100 labels."
+        description="List of label IDs to add to the message. You can add up to 100 labels.",
     )
     remove_labels: Optional[List[str]] = Field(
         default=None,
-        description="List of label IDs to remove from the message. You can remove up to 100 labels."
+        description="List of label IDs to remove from the message. You can remove up to 100 labels.",
     )
 
 

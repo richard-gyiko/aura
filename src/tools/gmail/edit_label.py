@@ -10,20 +10,16 @@ from pydantic import BaseModel, Field
 
 
 class EditLabelSchema(BaseModel):
-    label_id: str = Field(
-        description="The ID of the label to edit"
-    )
+    label_id: str = Field(description="The ID of the label to edit")
     new_name: Optional[str] = Field(
-        default=None,
-        description="The new display name for the label"
+        default=None, description="The new display name for the label"
     )
     message_list_visibility: Optional[str] = Field(
-        default=None,
-        description="Show/hide the label in the message list [show, hide]"
+        default=None, description="Show/hide the label in the message list [show, hide]"
     )
     label_list_visibility: Optional[str] = Field(
         default=None,
-        description="Show/hide the label in the label list [labelShow, labelHide]"
+        description="Show/hide the label in the label list [labelShow, labelHide]",
     )
 
 
@@ -56,22 +52,22 @@ class GmailEditLabel(GmailBaseTool):
             current_label = (
                 self.api_resource.users()
                 .labels()
-                .get(userId='me', id=label_id)
+                .get(userId="me", id=label_id)
                 .execute()
             )
 
             # Update only provided fields
             if new_name is not None:
-                current_label['name'] = new_name
+                current_label["name"] = new_name
             if message_list_visibility is not None:
-                current_label['messageListVisibility'] = message_list_visibility
+                current_label["messageListVisibility"] = message_list_visibility
             if label_list_visibility is not None:
-                current_label['labelListVisibility'] = label_list_visibility
+                current_label["labelListVisibility"] = label_list_visibility
 
             result = (
                 self.api_resource.users()
                 .labels()
-                .update(userId='me', id=label_id, body=current_label)
+                .update(userId="me", id=label_id, body=current_label)
                 .execute()
             )
 

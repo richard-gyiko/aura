@@ -102,7 +102,7 @@ class GoogleCalendarCreateEvent(GoogleCalendarBaseTool):
                 body["location"] = location
             if description != "":
                 body["description"] = description
-            
+
             if attendees:
                 body["attendees"] = [{"email": email} for email in attendees]
 

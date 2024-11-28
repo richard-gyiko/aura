@@ -10,16 +10,14 @@ from pydantic import BaseModel, Field
 
 
 class CreateLabelSchema(BaseModel):
-    name: str = Field(
-        description="The display name of the label to create"
-    )
+    name: str = Field(description="The display name of the label to create")
     message_list_visibility: Optional[str] = Field(
         default="show",
-        description="Show/hide the label in the message list [show, hide]"
+        description="Show/hide the label in the message list [show, hide]",
     )
     label_list_visibility: Optional[str] = Field(
         default="labelShow",
-        description="Show/hide the label in the label list [labelShow, labelHide]"
+        description="Show/hide the label in the label list [labelShow, labelHide]",
     )
 
 
@@ -48,15 +46,15 @@ class GmailCreateLabel(GmailBaseTool):
     ) -> str:
         try:
             label = {
-                'name': name,
-                'messageListVisibility': message_list_visibility,
-                'labelListVisibility': label_list_visibility
+                "name": name,
+                "messageListVisibility": message_list_visibility,
+                "labelListVisibility": label_list_visibility,
             }
 
             result = (
                 self.api_resource.users()
                 .labels()
-                .create(userId='me', body=label)
+                .create(userId="me", body=label)
                 .execute()
             )
 

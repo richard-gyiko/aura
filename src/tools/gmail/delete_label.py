@@ -10,9 +10,7 @@ from pydantic import BaseModel, Field
 
 
 class DeleteLabelSchema(BaseModel):
-    label_id: str = Field(
-        description="The ID of the label to delete"
-    )
+    label_id: str = Field(description="The ID of the label to delete")
 
 
 class GmailDeleteLabel(GmailBaseTool):
@@ -38,8 +36,7 @@ class GmailDeleteLabel(GmailBaseTool):
     ) -> str:
         try:
             self.api_resource.users().labels().delete(
-                userId='me',
-                id=label_id
+                userId="me", id=label_id
             ).execute()
 
             return f"Label {label_id} deleted successfully."
