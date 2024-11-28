@@ -4,13 +4,18 @@ from typing import List, TYPE_CHECKING
 
 from langchain_community.agent_toolkits.base import BaseToolkit
 from langchain_core.tools import BaseTool
+from langchain_google_community.gmail.utils import (
+    build_resource_service,
+)
 from pydantic import ConfigDict, Field
 
-from .create_event import GoogleCalendarCreateEvent
-from .delete_event import GoogleCalendarDeleteEvent
-from .edit_event import GoogleCalendarEditEvent
-from .list_calendar_events import GoogleCalendarListEvents
-from .utils import build_resource_service
+
+from .create_label import GmailCreateLabel
+from .delete_label import GmailDeleteLabel
+from .edit_label import GmailEditLabel
+from .list_labels import GmailListLabels
+from .modify_email_labels import GmailModifyEmailLabels
+
 
 if TYPE_CHECKING:
     # This is for linting and IDE typehints
@@ -29,8 +34,8 @@ SCOPES = [
 ]
 
 
-class GoogleCalendarToolkit(BaseToolkit):
-    """Toolkit for interacting with Google Calendar.
+class GmailToolkitExt(BaseToolkit):
+    """Toolkit for interacting with Gmail.
 
     *Security Note*: This toolkit contains tools that can read and modify
         the state of a service; e.g., by reading, creating, updating, deleting
@@ -51,8 +56,9 @@ class GoogleCalendarToolkit(BaseToolkit):
     def get_tools(self) -> List[BaseTool]:
         """Get the tools in the toolkit."""
         return [
-            GoogleCalendarCreateEvent(api_resource=self.api_resource),
-            GoogleCalendarDeleteEvent(api_resource=self.api_resource),
-            GoogleCalendarEditEvent(api_resource=self.api_resource),
-            GoogleCalendarListEvents(api_resource=self.api_resource),
+            GmailCreateLabel(api_resource=self.api_resource),
+            GmailDeleteLabel(api_resource=self.api_resource),
+            GmailEditLabel(api_resource=self.api_resource),
+            GmailListLabels(api_resource=self.api_resource),
+            GmailModifyEmailLabels(api_resource=self.api_resource),
         ]

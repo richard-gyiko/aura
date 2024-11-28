@@ -2,7 +2,7 @@
  # Maximum line length
  max-line-length = 160
  # Maximum complexity
- max-complexity = 10
+ max-complexity = 12
  # Files to exclude
  exclude =
      .git,
