@@ -7,6 +7,8 @@ from langchain_core.tools import BaseTool
 from pydantic import ConfigDict, Field
 
 from .create_event import GoogleCalendarCreateEvent
+from .delete_event import GoogleCalendarDeleteEvent
+from .edit_event import GoogleCalendarEditEvent
 from .list_calendar_events import GoogleCalendarListEvents
 from .utils import build_resource_service
 
@@ -50,5 +52,7 @@ class GoogleCalendarToolkit(BaseToolkit):
         """Get the tools in the toolkit."""
         return [
             GoogleCalendarCreateEvent(api_resource=self.api_resource),
+            GoogleCalendarDeleteEvent(api_resource=self.api_resource),
+            GoogleCalendarEditEvent(api_resource=self.api_resource),
             GoogleCalendarListEvents(api_resource=self.api_resource),
         ]

@@ -47,6 +47,10 @@ class CreateEventSchema(BaseModel):
         default=None,
         description="The timezone in TZ Database Name format, e.g. 'America/New_York'. Defaults to the user's local timezone.",
     )
+    attendees: Optional[list[str]] = Field(
+        default=None,
+        description="List of email addresses of attendees to invite to the event.",
+    )
 
 
 class GoogleCalendarCreateEvent(GoogleCalendarBaseTool):
@@ -75,6 +79,7 @@ class GoogleCalendarCreateEvent(GoogleCalendarBaseTool):
         location: str = "",
         description: str = "",
         timezone: str = None,
+        attendees: Optional[list[str]] = None,
         run_manager: Optional[CallbackManagerForToolRun] = None,
     ) -> str:
         try:
@@ -97,6 +102,9 @@ class GoogleCalendarCreateEvent(GoogleCalendarBaseTool):
                 body["location"] = location
             if description != "":
                 body["description"] = description
+            
+            if attendees:
+                body["attendees"] = [{"email": email} for email in attendees]
 
             event = (
                 self.api_resource.events()
@@ -104,7 +112,7 @@ class GoogleCalendarCreateEvent(GoogleCalendarBaseTool):
                 .execute()
             )
 
-            return "Event created: " + event.get("htmlLink", "Failed to create event")
+            return f"Event created: {event.get('htmlLink')} (ID: {event.get('id')})"
         except Exception as e:
             self._logger.error(f"Failed to create calendar event: {str(e)}")
             raise
