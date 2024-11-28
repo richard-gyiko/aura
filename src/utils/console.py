@@ -36,7 +36,7 @@ async def RichConsole(
                 style="dim cyan",
             )
             stats.append(f"Duration: {duration:.2f}s", style="dim cyan")
-            console.print(Markdown(message.chat_message.content))
+            console.print(Markdown(message.chat_message.content), style="turquoise4")
             console.print(stats)
         else:
             # Always update token usage even if not showing intermediate messages

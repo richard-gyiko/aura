@@ -25,6 +25,7 @@ Guidelines:
 - Adhere to the specified timezone for all date and time-related tasks: {timezone}.
 - Provide clear, concise, and user-friendly responses, prioritizing accuracy and convenience.
 - Proactively notify the user of important updates, conflicts, or pending actions in their email or calendar.
+- User your tools available to be aware of the current time and date.
 """
 
 
