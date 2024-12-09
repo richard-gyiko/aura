@@ -1,18 +1,21 @@
 from __future__ import annotations
 
 import logging
-from typing import Optional
+from typing import List, Optional
 
 from autogen_core.application.logging import TRACE_LOGGER_NAME
 from langchain.callbacks.manager import CallbackManagerForToolRun
 from pydantic import BaseModel, Field
 
 from ._base import LanceDbTool
+from ._filters import build_where_clause, FilterCondition
 
 
 class GetEntitySchema(BaseModel):
-    table: str = Field(description="The name of the table to get the entity from")
-    where: str = Field(description="SQL WHERE clause to filter entities")
+    table_name: str = Field(description="The name of the table to get the entity from")
+    conditions: List[FilterCondition] = Field(
+        description="List of filter conditions that must ALL be met"
+    )
 
 
 class LanceDBGetEntity(LanceDbTool):
@@ -32,16 +35,16 @@ class LanceDBGetEntity(LanceDbTool):
 
     def _run(
         self,
-        table: str,
-        where: str,
+        table_name: str,
+        conditions: List[FilterCondition],
         run_manager: Optional[CallbackManagerForToolRun] = None,
     ) -> str:
         try:
-            table = self.open_table(table)
+            table = self.open_table(table_name)
 
-            # Here we would connect to LanceDB and query the data
-            # This is a placeholder for actual implementation
-            return f"Retrieved entities from table {table} where {where}"
+            where_clause = build_where_clause(conditions)
+            results = table.search().where(where_clause).to_list()
+            return f"Retrieved {len(results)} entities from table {table} where {where_clause}: {results}"
 
         except Exception as e:
             self._logger.error(f"Failed to get entities: {str(e)}")
