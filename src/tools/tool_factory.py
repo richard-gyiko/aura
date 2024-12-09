@@ -9,6 +9,7 @@ from .google_calendar.tookit import GoogleCalendarToolkit
 from .google_calendar.utils import (
     build_resource_service as build_google_calendar_resource_service,
 )
+from .lancedb.toolkit import LanceDbToolkit
 from .utilities.get_current_time import GetCurrentTime
 
 
@@ -30,6 +31,14 @@ def get_google_calendar_tools(scopes: list[str]):
         api_resource=build_google_calendar_resource_service(scopes=scopes)
     )
     tools = google_calendar_toolkit.get_tools()
+
+    autogen_tools = [LangChainToolAdapter(tool) for tool in tools]
+
+    return autogen_tools
+
+
+def get_lancedb_tools():
+    tools = LanceDbToolkit().get_tools()
 
     autogen_tools = [LangChainToolAdapter(tool) for tool in tools]
 

@@ -55,6 +55,12 @@ To run Aura on your local machine, follow these steps:
 python -m src.main
 ```
 
+### Running Tests
+  
+```bash
+python -m unittest src\tests.py -v
+```
+
 ### Technical ToDos
 - [ ] Upgrade to the AgentChat layer if mature enough
 

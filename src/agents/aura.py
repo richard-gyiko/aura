@@ -5,6 +5,7 @@ from autogen_ext.models import OpenAIChatCompletionClient
 from src.tools.tool_factory import (
     get_gmail_tools,
     get_google_calendar_tools,
+    get_lancedb_tools,
     get_utility_tools,
 )
 from tzlocal import get_localzone
@@ -39,6 +40,7 @@ def aura() -> AssistantAgent:
         get_gmail_tools(SCOPES)
         + get_google_calendar_tools(SCOPES)
         + get_utility_tools()
+        + get_lancedb_tools()
     )
 
     assistant = AssistantAgent(

@@ -11,3 +11,9 @@ langchain-google-community[gmail]~=2.0.2
 # OpenTelemetry
 opentelemetry-sdk
 opentelemetry-exporter-otlp-proto-grpc
+
+# Persistent Storage
+lancedb
+
+# Data Processing
+pandas
