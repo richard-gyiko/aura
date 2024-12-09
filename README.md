@@ -58,7 +58,7 @@ python -m src.main
 ### Running Tests
   
 ```bash
-python -m unittest src\tests.py -v
+python -m unittest src/tests/test_lancedb_integration.py -v
 ```
 
 ### Technical ToDos

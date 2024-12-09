@@ -16,17 +16,20 @@ from .schema_list import LanceDBListSchemas
 class LanceDbToolkit(BaseToolkit):
     """Toolkit for interacting with LanceDB."""
 
-    db_path: str = ".lancedb"
+    db_path: str = "./.lancedb"
+
+    def __init__(self, db_path: str = ".lancedb"):
+        self.db_path = db_path
 
     def get_tools(self) -> List[BaseTool]:
         """Get the tools in the toolkit."""
         return [
-            LanceDBCreateEntity(),
-            LanceDBDeleteEntity(),
-            LanceDBGetEntity(),
-            LanceDBSearchEntity(),
-            LanceDBUpdateEntity(),
-            LanceDBCreateSchema(),
-            LanceDBDeleteSchema(),
-            LanceDBListSchemas(),
+            LanceDBCreateEntity(db_path=self.db_path),
+            LanceDBDeleteEntity(db_path=self.db_path),
+            LanceDBGetEntity(db_path=self.db_path),
+            LanceDBSearchEntity(db_path=self.db_path),
+            LanceDBUpdateEntity(db_path=self.db_path),
+            LanceDBCreateSchema(db_path=self.db_path),
+            LanceDBDeleteSchema(db_path=self.db_path),
+            LanceDBListSchemas(db_path=self.db_path),
         ]

@@ -6,7 +6,11 @@ DB_PATH = "./.lancedb"
 
 
 class LanceDbTool:
+    def __init__(self, db_path: str = DB_PATH):
+        self.db_path = db_path
+
     def _get_db(self) -> lancedb.db.DBConnection:
+        return lancedb.connect(self.db_path)
         return lancedb.connect(DB_PATH)
 
     def open_table(self, table_name) -> lancedb.db.Table:
