@@ -2,7 +2,7 @@ import lancedb
 
 from ._types import SchemaInfo
 
-DB_PATH = ".lancedb"
+DB_PATH = "./.lancedb"
 
 
 class LanceDbTool:

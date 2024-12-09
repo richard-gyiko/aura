@@ -78,13 +78,10 @@ class SchemaInfo(LanceModel):
                         df[element.field_name], errors="coerce"
                     )
                 elif element.data_type.startswith("timestamp"):
-                    # Extract timestamp precision from type (e.g., 'timestamp[ms]' -> 'ms')
-                    precision = (
-                        element.data_type[10:-1] if "[" in element.data_type else "s"
-                    )
+                    # Convert to millisecond precision for LanceDB timestamp[ms] type
                     df[element.field_name] = pd.to_datetime(
-                        df[element.field_name], errors="coerce", unit=precision
-                    )
+                        df[element.field_name], errors="coerce"
+                    ).astype("datetime64[ms]")
                 elif element.data_type == "bool":
                     df[element.field_name] = df[element.field_name].astype("bool")
                 elif element.data_type == "string":

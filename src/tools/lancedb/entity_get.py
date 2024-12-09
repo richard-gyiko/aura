@@ -43,8 +43,27 @@ class LanceDBGetEntity(LanceDbTool):
             table = self.open_table(table_name)
 
             where_clause = build_where_clause(conditions)
-            results = table.search().where(where_clause).to_list()
-            return f"Retrieved {len(results)} entities from table {table} where {where_clause}: {results}"
+            results = table.search().where(where=where_clause, prefilter=True).to_list()
+
+            # Format the results in a more readable way
+            formatted_results = []
+            for entity in results:
+                # Convert entity to dict and format each field
+                entity_dict = dict(entity)
+                # Sort keys for consistent output
+                formatted_fields = [
+                    f"{k}: {entity_dict[k]}"
+                    for k in sorted(entity_dict.keys())
+                    if k != "vector"
+                ]
+                formatted_entity = "{\n    " + "\n    ".join(formatted_fields) + "\n}"
+                formatted_results.append(formatted_entity)
+
+            results_str = "\n".join(formatted_results)
+
+            return (
+                f"Found {len(results)} entities matching {where_clause}:\n{results_str}"
+            )
 
         except Exception as e:
             self._logger.error(f"Failed to get entities: {str(e)}")

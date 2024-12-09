@@ -39,16 +39,15 @@ class LanceDBCreateSchema(LanceDbTool):
                 schema_info_response.schema_elements, vector_size=1536
             )
 
-            print(result)
             self._logger.info(f"Generated pyarrow schema: {result}")
-
-            # Store schema info
-            schema_table = self.get_schema_info_table()
-            schema_table.add([schema_info_response.to_schema_info()])
 
             # Create actual table with schema
             db = self._get_db()
             db.create_table(schema_info_response.table_name, schema=result)
+
+            # Store schema info
+            schema_table = self.get_schema_info_table()
+            schema_table.add([schema_info_response.to_schema_info()])
 
             return f"Successfully created schema '{schema_info_response.table_name}'"
         except Exception as e:
