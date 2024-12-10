@@ -44,6 +44,15 @@ class SchemaInfo(LanceModel):
         elements_data = json.loads(self.schema_elements_str)
         return [SchemaElement(**element) for element in elements_data]
 
+    def update_schema_elements(self, elements: list[SchemaElement]) -> None:
+        """
+        Updates the schema elements and their string representation.
+
+        Args:
+            elements (list[SchemaElement]): New list of schema elements
+        """
+        self.schema_elements_str = self.schema_elements_to_str(elements)
+
     def create_dataframe(self, data: dict) -> pd.DataFrame:
         """
         Converts a dictionary to a pandas DataFrame using the schema elements for type conversion.

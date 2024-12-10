@@ -1,6 +1,7 @@
 .aider*
 .env
 
+.tests
 .lancedb
 
 credentials.json

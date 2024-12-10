@@ -13,7 +13,7 @@ opentelemetry-sdk
 opentelemetry-exporter-otlp-proto-grpc
 
 # Persistent Storage
-lancedb
+lancedb==0.17.0
 
 # Data Processing
 pandas
