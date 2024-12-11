@@ -1,4 +1,4 @@
-from autogen_ext.tools import LangChainToolAdapter
+from autogen_ext.tools.langchain import LangChainToolAdapter
 from langchain_google_community import GmailToolkit
 from langchain_google_community.gmail.utils import (
     build_resource_service as build_gmail_resource_service,
