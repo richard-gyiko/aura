@@ -12,6 +12,7 @@ from .schema_add_column import LanceDBAddColumn
 from .schema_create import LanceDBCreateSchema
 from .schema_delete import LanceDBDeleteSchema
 from .schema_drop_column import LanceDBDropColumn
+from .schema_elements_get import LanceDBGetSchemaElements
 from .schema_list import LanceDBListSchemas
 
 
@@ -21,6 +22,7 @@ class LanceDbToolkit(BaseToolkit):
     db_path: str = "./.lancedb"
 
     def __init__(self, db_path: str = ".lancedb"):
+        super().__init__()
         self.db_path = db_path
 
     def get_tools(self) -> List[BaseTool]:
@@ -36,4 +38,5 @@ class LanceDbToolkit(BaseToolkit):
             LanceDBListSchemas(db_path=self.db_path),
             LanceDBAddColumn(db_path=self.db_path),
             LanceDBDropColumn(db_path=self.db_path),
+            LanceDBGetSchemaElements(db_path=self.db_path),
         ]

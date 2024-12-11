@@ -13,7 +13,7 @@ from ._base import LanceDbTool
 
 class CreateEntitySchema(BaseModel):
     table: str = Field(description="The name of the table to create the entity in")
-    data: Dict[str, Any] = Field(description="The entity data to insert")
+    data: Dict[str, Any] = Field(description="The entity data in a dictionary format")
 
 
 class LanceDBCreateEntity(LanceDbTool):

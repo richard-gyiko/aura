@@ -49,7 +49,17 @@ class LanceDBCreateSchema(LanceDbTool):
             schema_table = self.get_schema_info_table()
             schema_table.add([schema_info_response.to_schema_info()])
 
-            return f"Successfully created schema '{schema_info_response.table_name}'"
+            # Get the created schema info to include in response
+            schema_info = self.get_schema_info(schema_info_response.table_name)
+            elements_str = schema_info.schema_elements_to_str(
+                schema_info.schema_elements
+            )
+
+            return (
+                f"Successfully created new table '{schema_info_response.table_name}':\n"
+                f"Description: {schema_info.description}\n"
+                f"Schema Elements:\n{elements_str}"
+            )
         except Exception as e:
             self._logger.error(f"Failed to create schema: {str(e)}")
             raise

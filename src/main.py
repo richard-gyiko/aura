@@ -4,12 +4,14 @@ from autogen_agentchat.messages import TextMessage
 from autogen_core.base import CancellationToken
 from dotenv import load_dotenv
 
-from .agents.aura import aura
+# from .agents.aura import aura
+from .agents.data_operator import data_operator
 from .utils.console import RichConsole
 
 
 async def main():
-    agent = aura()
+    # agent = aura()
+    agent = data_operator()
 
     while True:
         try:

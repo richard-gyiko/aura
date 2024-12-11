@@ -59,8 +59,16 @@ class LanceDBDropColumn(LanceDbTool):
             table = db.open_table(table_name)
             table.drop_columns([column_name])
 
+            # Get updated schema info for response
+            updated_schema_info = self.get_schema_info(table_name)
+            elements_str = updated_schema_info.schema_elements_to_str(
+                updated_schema_info.schema_elements
+            )
+
             return (
-                f"Successfully dropped column '{column_name}' from table '{table_name}'"
+                f"Successfully dropped column '{column_name}' from table '{table_name}':\n"
+                f"Description: {updated_schema_info.description}\n"
+                f"Updated Schema Elements:\n{elements_str}"
             )
         except Exception as e:
             self._logger.error(f"Failed to drop column: {str(e)}")
