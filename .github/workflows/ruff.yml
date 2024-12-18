@@ -1,4 +1,4 @@
-name: Flake8
+name: uv check
 
 on: [pull_request]
 
