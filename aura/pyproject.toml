@@ -1,7 +1,7 @@
 [project]
 name = "aura"
 version = "0.1.0"
-description = "Add your description here"
+description = "Aura is a project for managing and automating tasks using AI and various integrations."
 readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
