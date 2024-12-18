@@ -1,0 +1,28 @@
+name: uv check
+
+on: [pull_request]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Install uv
+      uses: astral-sh/setup-uv@v4
+      with:
+        version: "0.5.10"
+        enable-cache: true
+        cache-dependency-glob: "./aura/uv.lock"
+      
+    - name: Set up Python
+      working-directory: ./aura
+      run: uv python install
+        
+    - name: Install the project
+      working-directory: ./aura
+      run: uv sync --all-extras --dev
+        
+    - name: Run code check
+      working-directory: ./aura
+      run: uvx ruff check

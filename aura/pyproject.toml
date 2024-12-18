@@ -1,0 +1,17 @@
+[project]
+name = "aura"
+version = "0.1.0"
+description = "Aura is a project for managing and automating tasks using AI and various integrations."
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "autogen-agentchat==0.4.0.dev11",
+    "autogen-ext[langchain,openai]==0.4.0.dev11",
+    "langchain-google-community[gmail]>=2.0.3",
+    "python-dateutil>=2.9.0.post0",
+    "rich>=13.9.4",
+    "tzlocal>=5.2",
+]
+
+[tool.uv]
+prerelease = "allow"
