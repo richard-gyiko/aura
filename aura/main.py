@@ -4,8 +4,8 @@ from autogen_agentchat.messages import TextMessage
 from autogen_core.base import CancellationToken
 from dotenv import load_dotenv
 
-from .agents.aura import aura
-from .utils.console import RichConsole
+from agents.aura import aura
+from utils.console import RichConsole
 
 
 async def main():

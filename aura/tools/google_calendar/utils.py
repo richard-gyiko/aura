@@ -8,7 +8,7 @@ import os
 from typing import List, Optional, Tuple, TYPE_CHECKING
 
 from dateutil import tz
-from src.utils.timezone import get_local_timezone
+from utils.timezone import get_local_timezone
 
 if TYPE_CHECKING:
     from google.auth.transport.requests import Request  # type: ignore[import]

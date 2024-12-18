@@ -7,7 +7,7 @@ from autogen_core.application.logging import TRACE_LOGGER_NAME
 from googleapiclient.errors import HttpError
 from langchain.callbacks.manager import CallbackManagerForToolRun
 from pydantic import BaseModel, Field
-from src.utils.timezone import get_local_timezone
+from utils.timezone import get_local_timezone
 
 from .base import GoogleCalendarBaseTool
 from .utils import parse_and_format_datetime
