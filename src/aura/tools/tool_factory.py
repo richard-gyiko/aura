@@ -8,7 +8,7 @@ from langchain_google_community.gmail.utils import (
 from mcp import StdioServerParameters
 
 from .gmail.toolkit import GmailToolkitExt
-from .google_calendar.tookit import GoogleCalendarToolkit
+from .google_calendar.toolkit import GoogleCalendarToolkit
 from .google_calendar.utils import (
     build_resource_service as build_google_calendar_resource_service,
 )

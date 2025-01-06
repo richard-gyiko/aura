@@ -7,8 +7,6 @@ from agents.aura import aura
 
 from utils.console import RichConsole
 
-load_dotenv()
-
 
 async def main():
     agent = await aura()
@@ -33,4 +31,5 @@ async def main():
 
 
 if __name__ == "__main__":
+    load_dotenv()
     asyncio.run(main())
