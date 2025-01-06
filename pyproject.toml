@@ -6,6 +6,7 @@ readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
     "autogen-agentchat==0.4.0.dev13",
+    "autogen-ext-mcp>=0.2.0",
     "autogen-ext[langchain,openai,azure]==0.4.0.dev13",
     "langchain-google-community[gmail]>=2.0.3",
     "python-dateutil>=2.9.0.post0",

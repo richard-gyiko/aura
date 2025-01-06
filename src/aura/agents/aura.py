@@ -3,6 +3,7 @@ from zoneinfo import ZoneInfo
 from autogen_agentchat.agents import AssistantAgent
 from autogen_ext.models.openai import OpenAIChatCompletionClient
 from tools.tool_factory import (
+    get_file_system_tools,
     get_gmail_tools,
     get_google_calendar_tools,
     get_utility_tools,
@@ -34,11 +35,12 @@ def _get_timezone() -> ZoneInfo:
     return ZoneInfo(str(get_localzone()))
 
 
-def aura() -> AssistantAgent:
+async def aura() -> AssistantAgent:
     tools = (
         get_gmail_tools(SCOPES)
         + get_google_calendar_tools(SCOPES)
         + get_utility_tools()
+        + await get_file_system_tools()
     )
 
     assistant = AssistantAgent(

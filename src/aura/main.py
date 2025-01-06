@@ -3,13 +3,15 @@ import asyncio
 from autogen_agentchat.messages import TextMessage
 from autogen_core import CancellationToken
 from dotenv import load_dotenv
-
 from agents.aura import aura
+
 from utils.console import RichConsole
+
+load_dotenv()
 
 
 async def main():
-    agent = aura()
+    agent = await aura()
 
     while True:
         try:
@@ -31,5 +33,4 @@ async def main():
 
 
 if __name__ == "__main__":
-    load_dotenv()
     asyncio.run(main())
