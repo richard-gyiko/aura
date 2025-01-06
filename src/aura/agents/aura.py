@@ -49,6 +49,7 @@ def aura() -> AssistantAgent:
         ),
         tools=tools,
         system_message=SYSTEM_PROMPT_TEMPLATE.format(timezone=str(_get_timezone())),
+        reflect_on_tool_use=True,
     )
 
     return assistant
