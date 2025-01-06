@@ -3,7 +3,7 @@ from __future__ import annotations
 import logging
 from typing import List, Optional
 
-from autogen_core.application.logging import TRACE_LOGGER_NAME
+from autogen_core import TRACE_LOGGER_NAME
 from langchain.callbacks.manager import CallbackManagerForToolRun
 from langchain_google_community.gmail.base import GmailBaseTool
 from pydantic import BaseModel, Field

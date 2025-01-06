@@ -3,7 +3,7 @@ from __future__ import annotations
 import logging
 from typing import List, Optional, Type
 
-from autogen_core.application.logging import TRACE_LOGGER_NAME
+from autogen_core import TRACE_LOGGER_NAME
 from googleapiclient.errors import HttpError
 from langchain.callbacks.manager import CallbackManagerForToolRun
 from pydantic import BaseModel, Field

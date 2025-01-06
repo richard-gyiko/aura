@@ -1,7 +1,7 @@
 from zoneinfo import ZoneInfo
 
 from autogen_agentchat.agents import AssistantAgent
-from autogen_ext.models import OpenAIChatCompletionClient
+from autogen_ext.models.openai import OpenAIChatCompletionClient
 from tools.tool_factory import (
     get_gmail_tools,
     get_google_calendar_tools,
