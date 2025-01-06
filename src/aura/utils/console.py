@@ -3,7 +3,7 @@ from typing import AsyncGenerator
 
 from autogen_agentchat.base import Response
 from autogen_agentchat.messages import AgentMessage
-from autogen_core.components.models import RequestUsage
+from autogen_core.models import RequestUsage
 from rich.console import Console
 from rich.markdown import Markdown
 from rich.text import Text

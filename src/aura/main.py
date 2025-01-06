@@ -1,7 +1,7 @@
 import asyncio
 
 from autogen_agentchat.messages import TextMessage
-from autogen_core.base import CancellationToken
+from autogen_core import CancellationToken
 from dotenv import load_dotenv
 
 from agents.aura import aura

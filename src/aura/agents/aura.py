@@ -1,7 +1,7 @@
 from zoneinfo import ZoneInfo
 
 from autogen_agentchat.agents import AssistantAgent
-from autogen_ext.models import OpenAIChatCompletionClient
+from autogen_ext.models.openai import OpenAIChatCompletionClient
 from tools.tool_factory import (
     get_gmail_tools,
     get_google_calendar_tools,
@@ -49,6 +49,7 @@ def aura() -> AssistantAgent:
         ),
         tools=tools,
         system_message=SYSTEM_PROMPT_TEMPLATE.format(timezone=str(_get_timezone())),
+        reflect_on_tool_use=True,
     )
 
     return assistant
